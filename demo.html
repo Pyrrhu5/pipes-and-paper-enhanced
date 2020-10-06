@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Remarkable Canvas Experiment</title>
+    <canvas width="1000" height="1000" id="canvas"></canvas>
+</head>
+<body>
+<script>
+// Thanks https://github.com/ichaozi/RemarkableFramebuffer
+var MAX_X = 7509;
+var MAX_Y = 11277;
+var MAX_PRESSURE = 4095;
+
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+let websocket = new WebSocket("ws://127.0.0.1:6789/");
+
+let scaleX = canvas.width / MAX_X / 2;
+let scaleY = canvas.height / MAX_Y / 2;
+let scalePressure = 2 / MAX_PRESSURE;
+
+websocket.onmessage = function (event) {
+  let data = JSON.parse(event.data);
+  // data is [x, y, pressure]
+  let x = data[0] * scaleX;
+  let y = canvas.height - (data[1] * scaleY);
+  let size = data[2] * scalePressure;
+  ctx.beginPath();
+  ctx.arc(x, y, size, 0, 2 * Math.PI);
+  ctx.fill();
+};
+</script>
+</body>
+</html>
