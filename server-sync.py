@@ -43,15 +43,15 @@ def run_listen(queue):
       # Swap the numbers here, but we have to invert in the browser.
       if code == 0:
         # X
-        y = val
-      elif code == 1:
         x = val
+      elif code == 1:
+        y = val
 
       elif code == 24:
         pressure = val
 
-    if pressure > 1:
-      #print("x: %d y: %d, p: %d" % (x, y, pressure))
+    if True:
+      print("x: %d y: %d, p: %d" % (x, y, pressure))
       queue.put((x, y, pressure))
 
 def runner(queue):
