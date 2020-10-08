@@ -96,7 +96,10 @@ function draw() {
 
 
 function overlay(x, y) {
-  ctxOverlay.clearRect(0,0,canvasOverlay.width,canvasOverlay.height);  
+  // Clear when hovering, but keep drawing for the duration of a stroke to highlight it.
+  if (!penState) {
+    ctxOverlay.clearRect(0,0,canvasOverlay.width,canvasOverlay.height);  
+  }
   ctxOverlay.fillStyle = "rgb(200, 200, 255)";
   ctxOverlay.beginPath();
   ctxOverlay.arc(x, y, 10, 0, 2 * Math.PI);

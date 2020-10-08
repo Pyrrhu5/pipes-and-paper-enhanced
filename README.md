@@ -4,6 +4,8 @@ Experiment to reproduce the ReMarkable tablet screen on the desktop for white-bo
 
 ![screenshot](screenshot.jpg)
 
+![hello world](hello-world.png)
+
 There are already screensharing solutions. The official one requires an account. [reStream](https://github.com/rien/reStream) captures the framebuffer but in the latest ReMarkable firmware crawls, giving about 0.5 fps.
 
 The Remarkable tablet has access to the binary event stream for its input sensors in `/dev`. It also allows SSH access. Simple hack to stream this over SSH, parse the binary stream and send it over a websocket to a browser.
