@@ -2,7 +2,8 @@
 <html>
 <head>
     <title>Remarkable Canvas Experiment</title>
-    <canvas width="1176" height="750" id="canvas" style="border: 1px solid #aaa"></canvas>
+    <canvas width="1176" height="750" id="canvas-overlay" style="border: 1px solid #aaa; position: absolute; left: 10; right; 10"></canvas>
+    <canvas width="1176" height="750" id="canvas" style="border: 1px solid #aaa; position: absolute; left: 10; right; 10 "></canvas>
 </head>
 <body>
 <script>
@@ -20,6 +21,9 @@ var rotate = false;
 
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
+
+var canvasOverlay = document.getElementById("canvas-overlay");
+var ctxOverlay = canvasOverlay.getContext("2d");
 
 // Stroke only for drawing, fill only for debug.
 ctx.lineWidth = 2;
@@ -90,6 +94,14 @@ function draw() {
   }
 }
 
+
+function overlay(x, y) {
+  ctxOverlay.clearRect(0,0,canvasOverlay.width,canvasOverlay.height);  
+  ctxOverlay.fillStyle = "rgb(200, 200, 255)";
+  ctxOverlay.beginPath();
+  ctxOverlay.arc(x, y, 10, 0, 2 * Math.PI);
+  ctxOverlay.fill();
+}
 websocket.onmessage = function(event) {
   // data is [x, y, pressure]
   let data = JSON.parse(event.data);
@@ -100,11 +112,13 @@ websocket.onmessage = function(event) {
   ringbufferY[rbI] = data[1];
   ringbufferZ[rbI] = data[2];
 
+  overlay(data[0] * scaleX,  data[1] * scaleY);
+
   if (debug) {
-    ctx.fillStyle = "red";
-    ctx.beginPath();
-    ctx.fillRect(data[0] * scaleX, data[1] * scaleY, 2, 2);
-    ctx.fill();
+    ctxOverlay.fillStyle = "red";
+    ctxOverlay.beginPath();
+    ctxOverlay.fillRect(data[0] * scaleX, data[1] * scaleY, 2, 2);
+    ctxOverlay.fill();
   }
 
   draw();
