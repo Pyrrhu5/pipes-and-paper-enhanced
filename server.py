@@ -4,6 +4,10 @@ import websockets
 import json
 import threading
 import queue
+import http
+import os
+
+REMARKABLE_HOSTNAME = "remarkable"
 
 def run_listen(queue):
   x = 0
@@ -12,9 +16,18 @@ def run_listen(queue):
 
   print("Run listen thread")
 
+  # Pre-emptive check, can we connect at all?
+  # Harder to detect at the next step when we're getting a constant stream,
+  # so can't check the error code.
+  try:
+    result = subprocess.run(["ssh", "-o", "ConnectTimeout=2", REMARKABLE_HOSTNAME, "true"], check=True)
+  except:
+    print("Error: Can't connect to reMarkable tablet on hostname : '%s'." % REMARKABLE_HOSTNAME)
+    os._exit(1)
+
   # Relies on the right setting ~/.ssh/config for hostname and public key.
   process = subprocess.Popen(
-    ["ssh", "remarkable", "cat /dev/input/event0"],
+    ["ssh", REMARKABLE_HOSTNAME, "cat /dev/input/event0"],
     stdout=subprocess.PIPE)
 
   for buf in iter(lambda: process.stdout.read(16), b''):
@@ -51,7 +64,7 @@ def run_listen(queue):
         pressure = val
 
     if True:
-      print("x: %d y: %d, p: %d" % (x, y, pressure))
+      #print("x: %d y: %d, p: %d" % (x, y, pressure))
       queue.put((x, y, pressure))
 
 def runner(queue):
@@ -63,15 +76,38 @@ event_queue = queue.Queue()
 # But the polling from the subprocess pipe is synchronous.
 threading.Thread(target=runner, args=(event_queue,)).start()
 
-async def handler(websocket, path):
-        print("Start handler", event_queue)
+async def websocket_handler(websocket, path):
         # TODO can't detect closing of websocket so if the client disconnects
         # we're still tying up the queue.
         while True:
           result = event_queue.get(block=True)
           await websocket.send(json.dumps(result))
 
-start_server = websockets.serve(handler, "localhost", 6789)
+async def http_handler(path, request):
+
+  # only serve index file or defer to websocket handler.
+  if path == "/websocket":
+    return None
+  elif path != "/":
+    return (http.HTTPStatus.NOT_FOUND, [], "")
+
+  body = open("index.html", "rb").read()
+  headers = [("Content-Type", "text/html"),
+             ("Content-Length", str(len(body))),
+             ("Connection", "close")]
+
+  return (http.HTTPStatus.OK, headers, body)
+
+PORT = 6789
+HOST = "localhost"
+
+start_server = websockets.serve(websocket_handler,
+                                "localhost",
+                                6789,
+                                ping_interval=1000,
+                                process_request=http_handler)
+
+print("Visit http://%s:%d/" % (HOST, PORT))
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()

@@ -28,7 +28,7 @@ var ctxOverlay = canvasOverlay.getContext("2d");
 // Stroke only for drawing, fill only for debug.
 ctx.lineWidth = 2;
 
-let websocket = new WebSocket("ws://127.0.0.1:6789/");
+let websocket = new WebSocket("ws://" + location.host + "/websocket");
 
 let scaleX = canvas.width / MAX_X / 2;
 let scaleY = canvas.height / MAX_Y / 2;
@@ -117,14 +117,15 @@ websocket.onmessage = function(event) {
 
   overlay(data[0] * scaleX,  data[1] * scaleY);
 
+  draw();
+
   if (debug) {
-    ctxOverlay.fillStyle = "red";
-    ctxOverlay.beginPath();
-    ctxOverlay.fillRect(data[0] * scaleX, data[1] * scaleY, 2, 2);
-    ctxOverlay.fill();
+    ctx.fillStyle = "red";
+    ctx.beginPath();
+    ctx.fillRect(data[0] * scaleX, data[1] * scaleY, 2, 2);
+    ctx.fill();
   }
 
-  draw();
 };
 
 document.addEventListener('keydown', logKey);
