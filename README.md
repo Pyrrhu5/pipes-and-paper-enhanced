@@ -62,8 +62,5 @@ So the data is smoothed in a small averaged ring-buffer. Press `d` in the browse
 
 This was a one-evening hack. But it's promising.
 
-1. Not great at detecting failed connection to the device.
-2. Can't detect closing the browser. So if you do that you'll have to to quit the script (ctrl-c) and start it again.
-3. Proper axes and scaling.
-4. Capture keys as well to clear screen.
-5. Clear up mess of mixture of async and synchronous threaded code.
+1. Proper axes and scaling.
+2. Capture hardware keys as well to clear screen.

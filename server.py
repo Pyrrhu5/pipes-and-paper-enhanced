@@ -9,6 +9,14 @@ import os
 
 REMARKABLE_HOSTNAME = "remarkable"
 
+def check():
+  # Pre-emptive check, can we connect at all?
+  try:
+    result = subprocess.run(["ssh", "-o", "ConnectTimeout=2", REMARKABLE_HOSTNAME, "true"], check=True)
+  except:
+    print("Error: Can't connect to reMarkable tablet on hostname : '%s'." % REMARKABLE_HOSTNAME)
+    os._exit(1)
+
 def run_listen(queue):
   x = 0
   y = 0
@@ -23,14 +31,19 @@ def run_listen(queue):
     result = subprocess.run(["ssh", "-o", "ConnectTimeout=2", REMARKABLE_HOSTNAME, "true"], check=True)
   except:
     print("Error: Can't connect to reMarkable tablet on hostname : '%s'." % REMARKABLE_HOSTNAME)
-    os._exit(1)
+    #os._exit(1)
 
   # Relies on the right setting ~/.ssh/config for hostname and public key.
   process = subprocess.Popen(
-    ["ssh", REMARKABLE_HOSTNAME, "cat /dev/input/event0"],
+    ["ssh", "-o", "ConnectTimeout=2", REMARKABLE_HOSTNAME, "cat /dev/input/event0"],
     stdout=subprocess.PIPE)
 
   for buf in iter(lambda: process.stdout.read(16), b''):
+
+    # Process stopped? Exit loop.
+    if process.poll():
+      break
+
     timestamp = buf[0:4]
 
     a = buf[4:8]
@@ -63,8 +76,6 @@ def run_listen(queue):
       elif code == 24:
         pressure = val
 
-    if True:
-      #print("x: %d y: %d, p: %d" % (x, y, pressure))
       queue.put((x, y, pressure))
 
 def runner(queue):
@@ -77,11 +88,49 @@ event_queue = queue.Queue()
 threading.Thread(target=runner, args=(event_queue,)).start()
 
 async def websocket_handler(websocket, path):
-        # TODO can't detect closing of websocket so if the client disconnects
-        # we're still tying up the queue.
-        while True:
-          result = event_queue.get(block=True)
-          await websocket.send(json.dumps(result))
+  x = 0
+  y = 0
+  pressure = 0
+
+  # The async subprocess library only accepts a string command, not a list.
+  command = "ssh -o ConnectTimeout=2 " + REMARKABLE_HOSTNAME + " cat /dev/input/event0"
+
+  proc = await asyncio.create_subprocess_shell(
+          command,
+          stdout=asyncio.subprocess.PIPE,
+          stderr=asyncio.subprocess.PIPE)
+  print("Started")
+
+  try:
+    # Keep looping as long as the process is alive.
+    # Terminated websocket connection is handled with a throw.
+    while proc.returncode == None:
+      buf = await proc.stdout.read(16)
+
+      timestamp = buf[0:4]
+      a = buf[4:8]
+      b = buf[8:12]
+      c = buf[12:16]
+
+      # Using notes from https://github.com/ichaozi/RemarkableFramebuffer
+      typ = b[0]
+      code = b[2] + b[3] * 0x100
+      val = c[0] + c[1] * 0x100 + c[2] * 0x10000 + c[3] * 0x1000000
+
+      # Absolute position.
+      if typ == 3:
+        if code == 0:
+          x = val
+        elif code == 1:
+          y = val
+        elif code == 24:
+          pressure = val
+
+        await websocket.send(json.dumps((x,y,pressure)))
+
+  finally:
+    print("FINALLY")
+    proc.kill()
 
 async def http_handler(path, request):
 
