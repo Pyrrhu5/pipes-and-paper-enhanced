@@ -48,6 +48,8 @@ let debug = false;
 let lastX = null;
 let lastY = null;
 
+let penColor = "rgb(0, 0, 0)";
+
 function draw() {
   // Loop through ringbuffer elements...
   // Average all ringbuffer elements where the pressure is nonzeroish.
@@ -79,11 +81,21 @@ function draw() {
   } else {
     // Only start drawing if we already started a line.
     if (penState) {
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(lastX, lastY);
-        ctx.lineTo(avgX, avgY);
-        ctx.stroke();
+        if (!penColor.length) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(avgX, avgY, 10, 0, 2 * Math.PI);
+            ctx.clip();
+            ctx.clearRect(avgX - 11, avgY - 11, 22, 22);
+            ctx.restore();
+        } else {
+            ctx.strokeStyle = penColor;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(avgX, avgY);
+            ctx.stroke();
+        }
      }
      penState = true;
 
@@ -142,6 +154,34 @@ function logKey(e) {
     // Space for clear.
     canvas.width = canvas.width;
     e.preventDefault();
+  } else if (e.keyCode == 48) {
+    // '0' for erase
+    penColor = "";
+  } else if (e.keyCode == 49) {
+    // '1' for black
+    penColor = "rgb(0, 0, 0)";
+  } else if (e.keyCode == 50) {
+    // '2' for orange
+    penColor = "rgb(230, 159, 0)";
+  } else if (e.keyCode == 51) {
+    // '3' for sky blue
+    penColor = "rgb(86, 180, 233)";
+  } else if (e.keyCode == 52) {
+    // '4' for bluish green
+    penColor = "rgb(0, 158, 115)";
+  } else if (e.keyCode == 53) {
+    // '5' for yellow
+    penColor = "rgb(240, 228, 66)";
+  } else if (e.keyCode == 54) {
+    // '6' for blue
+    penColor = "rgb(0, 114, 178)";
+  } else if (e.keyCode == 55) {
+    // '7' for vermilion
+    penColor = "rgb(213, 94, 0)";
+  } else if (e.keyCode == 56) {
+    // '8' for reddish purple
+    penColor = "rgb(204, 121, 167)";
+
   } else if (e.keyCode == 68) {
     // 'd' for debug
     debug = !debug;
