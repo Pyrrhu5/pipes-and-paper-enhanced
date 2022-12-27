@@ -7,6 +7,8 @@ import subprocess
 
 import websockets
 
+from screen_api import EventCodes, EventTypes, get_screen_input
+
 
 def check(rm_hostname):
     try:
@@ -52,34 +54,23 @@ async def websocket_handler(websocket, path, rm_host, rm_model):
         # Keep looping as long as the process is alive.
         # Terminated websocket connection is handled with a throw.
         while proc.returncode == None:
-            buf = await proc.stdout.read(16)
+            screen_input = await get_screen_input(proc)
+            if not screen_input: # or screen_input.type != EventTypes.ABSOLUTE: 
+                continue
 
-            # TODO expect 16-bit chunks, or no data.
-            # There are synchronisation signals in the data stream, maybe use those
-            # if we drift somehow.
-            if len(buf) == 16:
-                timestamp = buf[0:4]
-                a = buf[4:8]
-                b = buf[8:12]
-                c = buf[12:16]
+            #TODO Replace by a proper JSON dump
+            if screen_input.code == EventCodes.X:
+                x = screen_input.value
+            elif screen_input.code == EventCodes.Y:
+                y = screen_input.value
+            elif screen_input.code == EventCodes.PRESSURE:
+                pressure = screen_input.value
+            elif screen_input.code == EventCodes.UNKNOWN:
+                print(f"{screen_input=}")
 
-                # Using notes from https://github.com/ichaozi/RemarkableFramebuffer
-                # or https://github.com/canselcik/libremarkable/wiki
-                typ = b[0]
-                code = b[2] + b[3] * 0x100
-                val = c[0] + c[1] * 0x100 + c[2] * 0x10000 + c[3] * 0x1000000
 
-                print(f"{typ=} {code=} {val=}")
-                # Absolute position.
-                if typ == 3:
-                    if code == 0:
-                        x = val
-                    elif code == 1:
-                        y = val
-                    elif code == 24:
-                        pressure = val
-
-                    await websocket.send(json.dumps((x, y, pressure)))
+            #TODO Send it also the ERASER or TIP
+            await websocket.send(json.dumps((x, y, pressure)))
         print("Disconnected from ReMarkable.")
 
     finally:
