@@ -15,7 +15,7 @@ def check(rm_hostname):
                 "ssh",
                 "-o",
                 "ConnectTimeout=2",
-                rm_hostname,
+                "rem",
                 "cat",
                 "/proc/device-tree/model",
             ],
@@ -37,7 +37,7 @@ async def websocket_handler(websocket, path, rm_host, rm_model):
         raise NotImplementedError(f"Unsupported reMarkable Device : {rm_model}")
 
     # The async subprocess library only accepts a string command, not a list.
-    command = f"ssh -o ConnectTimeout=2 {rm_host} cat {device}"
+    command = f"ssh -o ConnectTimeout=2 rem cat {device}"
 
     x = 0
     y = 0
@@ -69,6 +69,7 @@ async def websocket_handler(websocket, path, rm_host, rm_model):
                 code = b[2] + b[3] * 0x100
                 val = c[0] + c[1] * 0x100 + c[2] * 0x10000 + c[3] * 0x1000000
 
+                print(f"{typ=} {code=} {val=}")
                 # Absolute position.
                 if typ == 3:
                     if code == 0:
