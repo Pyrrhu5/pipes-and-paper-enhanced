@@ -1,7 +1,7 @@
 from __future__ import annotations
-import asyncio
 from asyncio.subprocess import Process
 from dataclasses import dataclass
+from json import dumps
 from struct import unpack
 from enum import Enum
 from typing import Optional, Union
@@ -51,6 +51,19 @@ class ScreenInputEvent:
     type: EventTypes
     code: EventCodes
     value: Union[int, bool]
+
+    @property
+    def __dict__(self):
+        return {
+            "timestamp": self.timestamp,
+            "type": self.type.name.lower(),
+            "code": self.code.name.lower(),
+            "value": self.value
+        }
+
+    @property
+    def json(self):
+        return dumps(self.__dict__)
 
 
 def decode_screen_event(buffer: bytes) -> ScreenInputEvent:

@@ -42,5 +42,5 @@ def run_server(rm_host="rem", host="localhost", port=6789):
     asyncio.get_event_loop().run_forever()
 
 if __name__ == "__main__":
-    # run_debug()
-    run_server()
+    run_debug()
+    # run_server()
