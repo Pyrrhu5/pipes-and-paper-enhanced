@@ -1,4 +1,5 @@
 from __future__ import annotations
+import asyncio
 from asyncio.subprocess import Process
 from dataclasses import dataclass
 from struct import unpack
