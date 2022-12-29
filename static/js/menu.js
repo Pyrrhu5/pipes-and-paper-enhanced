@@ -50,7 +50,7 @@ function on_key_press(e) {
     default:
       if (action in pencolors) {
         penColor = pencolors[action];
-        document.getElementById("pencolor").style.background = pencolors[action];
+        document.getElementById("pen").contentDocument.getElementById("icon").setAttribute("fill",  pencolors[action]);
       }
   }
 }
