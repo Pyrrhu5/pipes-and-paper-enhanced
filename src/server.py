@@ -1,4 +1,5 @@
 import http
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 import json
 
 
@@ -57,3 +58,36 @@ async def http_handler(path, request):
 
     return (http.HTTPStatus.OK, headers, body)
 
+
+class HttpHandler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        print(f"{'='*5} {self.path} {'='*5}")
+        type = "text/html"
+        # Switch on path
+        if self.path == "/":
+            self.path = "/index.html"
+        elif self.path == "/static/js/menu.js":
+            type = "text/javascript"
+        elif self.path == "/static/img/pen-solid.svg":
+            type = "image/svg+xml"
+        else:
+            print("UNRECONGIZED REQUEST: ", self.path)
+            self.path = "/404"
+        
+        if self.path != "/404":
+            self.send_response(200)
+        else:
+            self.send_response(404)
+
+        self.send_header("Content-type", type)
+        self.end_headers()
+        
+        if self.path != "/404":
+            with open(self.path[1:], 'rb') as file: 
+                self.wfile.write(file.read()) # Send
+
+def run_http_server(server_class=HTTPServer, handler_class=HttpHandler):
+    server_address = ('', 8001)
+    httpd = server_class(server_address, handler_class)
+    print("Serving http server on http://localhost:8001")
+    httpd.serve_forever()

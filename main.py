@@ -2,11 +2,12 @@
 import asyncio
 import functools
 
+import threading
 import websockets
 
 from src.connection import SCREEN_DEVICE_PER_MODEL, get_remarkable_model, get_screen_listener
 from src.screen_api import get_screen_input
-from src.server import http_handler, websocket_handler
+from src.server import http_handler, run_http_server, websocket_handler
 
 
 def run_debug():
@@ -32,6 +33,8 @@ def run_server(rm_host="rem", host="localhost", port=6789):
     bound_handler = functools.partial(
         websocket_handler, device=device 
     )
+    http_thread = threading.Thread(target=run_http_server)
+    http_thread.start()
     start_server = websockets.serve(
         bound_handler, host, port, ping_interval=1000, process_request=http_handler
     )
