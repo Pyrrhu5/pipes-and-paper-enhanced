@@ -1,4 +1,7 @@
 import asyncio
+from typing import Union
+from dataclasses import dataclass
+from enum import Enum
 import functools
 import json
 from http.server import HTTPServer, SimpleHTTPRequestHandler
@@ -9,6 +12,20 @@ import websockets
 from src.connection import (SCREEN_DEVICE_PER_MODEL, get_remarkable_model,
                             get_screen_listener)
 from src.screen_api import EventCodes, EventTypes, get_screen_input
+
+
+def websocket_payload(payload_type, message: list[Union[Enum, tuple]]):
+    payload = {"type": payload_type}
+    if isinstance(message, dict):
+        payload["message"] = message
+    elif not len(message):
+        ...
+    elif isinstance(message[0], Enum):
+        payload["message"] = {
+            m.name: m.value
+            for m in message
+        }
+    return json.dumps(payload)
 
 
 class Websocket(Thread):
@@ -45,18 +62,21 @@ class Websocket(Thread):
             # Terminated websocket connection is handled with a throw.
             while not listener.returncode:
                 screen_input = await get_screen_input(listener)
-                if not screen_input or screen_input.type != EventTypes.ABSOLUTE:
-                    continue
 
-                # TODO Replace by a proper JSON dump
-                if screen_input.code == EventCodes.X:
-                    x = screen_input.value
-                elif screen_input.code == EventCodes.Y:
-                    y = screen_input.value
-                elif screen_input.code == EventCodes.PRESSURE:
-                    pressure = screen_input.value
-                # TODO Send it also the ERASER or TIP
-                await websocket.send(json.dumps((x, y, pressure)))
+                if not screen_input:
+                    continue
+                # It's sending coordinates
+                elif screen_input.type == EventTypes.ABSOLUTE:
+                    if screen_input.code == EventCodes.X:
+                        x = screen_input.value
+                    elif screen_input.code == EventCodes.Y:
+                        y = screen_input.value
+                    elif screen_input.code == EventCodes.PRESSURE:
+                        pressure = screen_input.value
+                    await websocket.send(websocket_payload("coordinates", {"x": x, "y": y, "pressure": pressure}))
+                # It's sending tool used
+                elif screen_input.type == EventTypes.KEY and screen_input.code in (EventCodes.ERASER, EventCodes.TIP):
+                    await websocket.send(websocket_payload("tool", [screen_input.code]))
             print("Disconnected from ReMarkable.")
         finally:
             listener.kill()

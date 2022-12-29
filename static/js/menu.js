@@ -48,9 +48,9 @@ function on_key_press(e) {
       debug = !debug;
       break;
     default:
-      if (action in pencolors) {
+      if (action in pencolors && last_tool == tools.TIP) {
         penColor = pencolors[action];
-        document.getElementById("pen").contentDocument.getElementById("icon").setAttribute("fill",  pencolors[action]);
+        document.getElementById("pen").contentDocument.getElementById("icon").setAttribute("fill", pencolors[action]);
       }
   }
 }

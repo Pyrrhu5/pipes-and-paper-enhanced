@@ -19,8 +19,13 @@
 <body>
   <object id="pen" class="menu-icon" type="image/svg+xml" data="static/img/pen-solid.svg"></object>
   <script src="static/js/menu.js" type="text/javascript"></script>
+  <script src="static/js/handler.js" type="text/javascript"></script>
   <script>
 
+    const tools = {
+      "ERASER": 321,
+      "TIP": 320
+    };
     // Thanks https://github.com/ichaozi/RemarkableFramebuffer
     var MAX_X = 11277;
     var MAX_Y = 7509;
@@ -28,6 +33,7 @@
     var MAX_PRESSURE = 4095;
     var MAX_DISPLAY_PRESSURE = 10;
     var RINGBUFFER_SIZE = 10;
+    var last_tool = tools.ERASER;
 
     // landscape / portrait
     var rotate = false;
@@ -41,8 +47,6 @@
     // Stroke only for drawing, fill only for debug.
     ctx.lineWidth = 2;
 
-    // let websocket = new WebSocket("ws://" + location.host + "/websocket");
-    let websocket = new WebSocket("ws://" + "localhost:6789" + "/websocket");
 
     let scaleX = canvas.width / MAX_X / 2;
     let scaleY = canvas.height / MAX_Y / 2;
@@ -64,6 +68,14 @@
 
     let penColor = "rgb(0, 0, 0)";
 
+    pen_menu_logo = document.getElementById("pen")
+    pen_menu_logo.addEventListener('load', function () {
+      if (last_tool == tools.TIP) {
+        pen_menu_logo.contentDocument.getElementById("icon").setAttribute("fill", penColor);
+      } else {
+        pen_menu_logo.contentDocument.getElementById("icon").setAttribute("fill", "black");
+      }
+    });
     function draw() {
       // Loop through ringbuffer elements...
       // Average all ringbuffer elements where the pressure is nonzeroish.
@@ -95,20 +107,24 @@
       } else {
         // Only start drawing if we already started a line.
         if (penState) {
-          if (!penColor.length) {
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(avgX, avgY, 10, 0, 2 * Math.PI);
-            ctx.clip();
-            ctx.clearRect(avgX - 11, avgY - 11, 22, 22);
-            ctx.restore();
-          } else {
-            ctx.strokeStyle = penColor;
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(avgX, avgY);
-            ctx.stroke();
+          if (last_tool == tools.TIP) {
+            if (!penColor.length) {
+              ctx.save();
+              ctx.beginPath();
+              ctx.arc(avgX, avgY, 10, 0, 2 * Math.PI);
+              ctx.clip();
+              ctx.clearRect(avgX - 11, avgY - 11, 22, 22);
+              ctx.restore();
+            } else {
+              ctx.strokeStyle = penColor;
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.moveTo(lastX, lastY);
+              ctx.lineTo(avgX, avgY);
+              ctx.stroke();
+            }
+          } else if (last_tool == tools.ERASER) {
+            ctx.clearRect(avgX - 10, avgY - 10, 20, 20);
           }
         }
         penState = true;
@@ -131,28 +147,8 @@
       ctxOverlay.arc(x, y, 10, 0, 2 * Math.PI);
       ctxOverlay.fill();
     }
-    websocket.onmessage = function (event) {
-      // data is [x, y, pressure]
-      let data = JSON.parse(event.data);
 
-      // Pre-increment rbI so we can use it in draw to refer to the current head.
-      rbI = (rbI + 1) % RINGBUFFER_SIZE;
-      ringbufferX[rbI] = data[0];
-      ringbufferY[rbI] = data[1];
-      ringbufferZ[rbI] = data[2];
 
-      overlay(data[0] * scaleX, data[1] * scaleY);
-
-      draw();
-
-      if (debug) {
-        ctx.fillStyle = "red";
-        ctx.beginPath();
-        ctx.fillRect(data[0] * scaleX, data[1] * scaleY, 2, 2);
-        ctx.fill();
-      }
-
-    };
 
   </script>
 </body>
