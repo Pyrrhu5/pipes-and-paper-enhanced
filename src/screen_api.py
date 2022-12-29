@@ -1,9 +1,10 @@
 from __future__ import annotations
+
 from asyncio.subprocess import Process
 from dataclasses import dataclass
+from enum import Enum
 from json import dumps
 from struct import unpack
-from enum import Enum
 from typing import Optional, Union
 
 
@@ -17,10 +18,10 @@ class EventTypes(int, Enum):
 
 class EventCodes(int, Enum):
     """Which data point the value is a reference of, returns cls.UNKNOWN as a default.
-    
+
     Mixes codes from EventTypes.ABSOLUTE and EventTypes.KEY (and probably also the others in UNKNOWN)
     """
-    
+
     # Happens with EventTypes.ABSOLUTE
     X = 0
     Y = 1
@@ -71,12 +72,12 @@ def decode_screen_event(buffer: bytes) -> ScreenInputEvent:
 
     Some part of the buffer are not decoded:
         buffer[4:8]
-    
+
     See:
         https://github.com/ichaozi/RemarkableFramebuffer
         https://github.com/canselcik/libremarkable
     """
-    return  ScreenInputEvent(
+    return ScreenInputEvent(
         timestamp=unpack("f", buffer[0:4])[0],
         type=EventTypes(unpack("h", buffer[8:10])[0]),
         code=EventCodes(unpack("h", buffer[10:12])[0]),
@@ -89,5 +90,5 @@ async def get_screen_input(subprocess_shell: Process) -> Optional[ScreenInputEve
 
     if not len(buffer) == 16:
         raise ValueError(f"Buffer is not 16 bits: {len(buffer)=} {buffer=}")
-    
+
     return decode_screen_event(buffer)

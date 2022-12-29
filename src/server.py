@@ -1,17 +1,18 @@
 import asyncio
-from ctypes import addressof
 import functools
-from http.server import HTTPServer, SimpleHTTPRequestHandler
 import json
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 from threading import Thread
+
 import websockets
 
-from src.connection import SCREEN_DEVICE_PER_MODEL, get_remarkable_model, get_screen_listener
+from src.connection import (SCREEN_DEVICE_PER_MODEL, get_remarkable_model,
+                            get_screen_listener)
 from src.screen_api import EventCodes, EventTypes, get_screen_input
 
 
 class Websocket(Thread):
-    def __init__(self, remarkable_host: str, port: int=6789, address: str = "localhost") -> None:
+    def __init__(self, remarkable_host: str, port: int = 6789, address: str = "localhost") -> None:
         self.port = port
         self.address = address
         self.remarkable_host = remarkable_host
@@ -22,14 +23,15 @@ class Websocket(Thread):
         model = get_remarkable_model(self.remarkable_host)
         device = SCREEN_DEVICE_PER_MODEL[model]
         partial_handler = functools.partial(
-            self.handler, device=device 
+            self.handler, device=device
         )
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(
             websockets.serve(partial_handler, self.address, self.port)
         )
-        print(f"Websocket ready and running on http://{self.address}:{self.port}")
+        print(
+            f"Websocket ready and running on http://{self.address}:{self.port}")
         asyncio.get_event_loop().run_forever()
 
     async def handler(self, websocket, path, device):
@@ -43,17 +45,17 @@ class Websocket(Thread):
             # Terminated websocket connection is handled with a throw.
             while not listener.returncode:
                 screen_input = await get_screen_input(listener)
-                if not screen_input  or screen_input.type != EventTypes.ABSOLUTE: 
+                if not screen_input or screen_input.type != EventTypes.ABSOLUTE:
                     continue
 
-                #TODO Replace by a proper JSON dump
+                # TODO Replace by a proper JSON dump
                 if screen_input.code == EventCodes.X:
                     x = screen_input.value
                 elif screen_input.code == EventCodes.Y:
                     y = screen_input.value
                 elif screen_input.code == EventCodes.PRESSURE:
                     pressure = screen_input.value
-                #TODO Send it also the ERASER or TIP
+                # TODO Send it also the ERASER or TIP
                 await websocket.send(json.dumps((x, y, pressure)))
             print("Disconnected from ReMarkable.")
         finally:
@@ -76,7 +78,7 @@ class HttpHandler(SimpleHTTPRequestHandler):
         else:
             print("UNRECONGIZED REQUEST: ", self.path)
             self.path = "/404"
-        
+
         if self.path != "/404":
             self.send_response(200)
         else:
@@ -84,10 +86,10 @@ class HttpHandler(SimpleHTTPRequestHandler):
 
         self.send_header("Content-type", type)
         self.end_headers()
-        
+
         if self.path != "/404":
-            with open(self.path[1:], 'rb') as file: 
-                self.wfile.write(file.read()) # Send
+            with open(self.path[1:], 'rb') as file:
+                self.wfile.write(file.read())  # Send
 
 
 def run_http_server(server_class=HTTPServer, handler_class=HttpHandler):

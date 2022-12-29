@@ -1,8 +1,9 @@
 """Connection through SSH to the ReMarkable."""
 
 import asyncio
-from enum import Enum
 import subprocess
+from enum import Enum
+
 
 class RemarkableModels(str, Enum):
     V1 = "reMarkable 1.0"
@@ -35,7 +36,8 @@ def get_remarkable_model(ssh_hostname):
         )
         return RemarkableModels(model.stdout[:14].decode("utf-8"))
     except subprocess.CalledProcessError:
-        raise ValueError(f"Can't connect to reMarkable tablet on hostname : {ssh_hostname}")
+        raise ValueError(
+            f"Can't connect to reMarkable tablet on hostname : {ssh_hostname}")
 
 
 async def get_screen_listener(device: str):
@@ -44,4 +46,3 @@ async def get_screen_listener(device: str):
     return await asyncio.create_subprocess_shell(
         command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
-

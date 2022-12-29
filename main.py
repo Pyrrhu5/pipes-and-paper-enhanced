@@ -1,12 +1,10 @@
-
 import asyncio
-import functools
 
-import threading
-
-from src.connection import SCREEN_DEVICE_PER_MODEL, get_remarkable_model, get_screen_listener
+from src.connection import (SCREEN_DEVICE_PER_MODEL, get_remarkable_model,
+                            get_screen_listener)
 from src.screen_api import get_screen_input
-from src.server import run_http_server, Websocket
+from src.server import Websocket, run_http_server
+
 
 def run_debug():
     model = get_remarkable_model("rem")
@@ -26,6 +24,7 @@ def run_server():
     websocket_thread = Websocket(remarkable_host="rem")
     websocket_thread.start()
     run_http_server()
+
 
 if __name__ == "__main__":
     # run_debug()
