@@ -41,7 +41,21 @@ Setup:
 
 To run:
 
-1. `./run.sh`
+1. `./run.sh` or use the python interface directly `python3 main.py` to have access to more options
+
+```
+usage: main.py [-h] [-p PORT] [-s SSH_HOSTNAME] [--screen-debug]
+
+Screen share in browser for ReMarkable tablets.
+
+options:
+  -h, --help            show this help message and exit
+  -p PORT, --port PORT  The port to use to expose the website on localhost.
+  -s SSH_HOSTNAME, --ssh-hostname SSH_HOSTNAME
+                        The name of the ReMarkable SSH host.
+  --screen-debug        Instead of running the web server, run in screen input debug mode.
+```
+
 2. Visit <http://localhost:8001/>
 
 

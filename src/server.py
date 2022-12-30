@@ -118,8 +118,8 @@ class HttpHandler(SimpleHTTPRequestHandler):
                 self.wfile.write(file.read())  # Send
 
 
-def run_http_server(server_class=HTTPServer, handler_class=HttpHandler):
-    server_address = ('', 8001)
+def run_http_server(port: int, server_class=HTTPServer, handler_class=HttpHandler):
+    server_address = ('', port)
     httpd = server_class(server_address, handler_class)
-    print("Serving http server on http://localhost:8001")
+    print(f"Serving http server on http://localhost:{port}")
     httpd.serve_forever()
