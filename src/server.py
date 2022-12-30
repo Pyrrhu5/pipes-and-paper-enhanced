@@ -30,10 +30,10 @@ def websocket_payload(payload_type, message: list[Union[Enum, tuple]]):
 
 
 class Websocket(Thread):
-    def __init__(self, remarkable_host: str, port: int = 6789, address: str = "localhost") -> None:
+    def __init__(self, ssh_hostname: str, port: int = 6789, address: str = "localhost") -> None:
         self.port = port
         self.address = address
-        self.remarkable_host = remarkable_host
+        self.ssh_hostname = ssh_hostname
         super().__init__(daemon=True)
 
     def run(self):
@@ -41,15 +41,15 @@ class Websocket(Thread):
         model = None
         while not model:
             try:
-                model = get_remarkable_model(self.remarkable_host)
+                model = get_remarkable_model(self.ssh_hostname)
             except Exception:
                 print(
-                    f"Can cannot connect to ReMarkable on {self.remarkable_host}. Retrying..."
+                    f"Can cannot connect to ReMarkable on {self.ssh_hostname}. Retrying..."
                 )
                 sleep(0.5)
         device = SCREEN_DEVICE_PER_MODEL[model]
         partial_handler = functools.partial(
-            self.handler, device=device
+            self.handler, device=device, ssh_hostname=self.ssh_hostname
         )
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -60,12 +60,12 @@ class Websocket(Thread):
             f"Websocket ready and running on http://{self.address}:{self.port}")
         asyncio.get_event_loop().run_forever()
 
-    async def handler(self, websocket, path, device):
+    async def handler(self, websocket, path, device, ssh_hostname):
         x = 0
         y = 0
         pressure = 0
 
-        listener = await get_screen_listener(device)
+        listener = await get_screen_listener(device, ssh_hostname)
         try:
             # Keep looping as long as the process is alive.
             # Terminated websocket connection is handled with a throw.

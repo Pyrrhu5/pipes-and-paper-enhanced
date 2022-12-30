@@ -7,10 +7,12 @@ from src.server import Websocket, run_http_server
 
 
 def run_debug():
-    model = get_remarkable_model("rem")
+    ssh_hostname = "rem"
+    model = get_remarkable_model(ssh_hostname)
     device = SCREEN_DEVICE_PER_MODEL[model]
     loop = asyncio.new_event_loop()
-    listener = loop.run_until_complete(get_screen_listener(device))
+    listener = loop.run_until_complete(
+        get_screen_listener(device, ssh_hostname))
     print(f"Listening on {device}")
 
     while not listener.returncode:
@@ -21,7 +23,7 @@ def run_debug():
 
 
 def run_server():
-    websocket_thread = Websocket(remarkable_host="rem")
+    websocket_thread = Websocket(ssh_hostname="rem")
     websocket_thread.start()
     run_http_server()
 
