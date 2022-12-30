@@ -4,7 +4,6 @@ document.addEventListener('keydown', on_key_press);
 const keyevents = {
   13: "ROTATE",
   32: "CLEAR",
-  48: "ERASE",
   68: "DEBUG",
   49: "BLACK",
   50: "ORANGE",

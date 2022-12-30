@@ -2,6 +2,7 @@
 let websocket = new WebSocket("ws://" + "localhost:6789" + "/websocket");
 
 function handle_tool_message(message) {
+    if (tools[message] == last_tool) { return; }
     last_tool = tools[message];
     pen_menu_logo = document.getElementById("pen");
     switch (last_tool) {

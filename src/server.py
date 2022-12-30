@@ -1,4 +1,5 @@
 import asyncio
+from time import sleep
 from typing import Union
 from dataclasses import dataclass
 from enum import Enum
@@ -37,7 +38,15 @@ class Websocket(Thread):
 
     def run(self):
 
-        model = get_remarkable_model(self.remarkable_host)
+        model = None
+        while not model:
+            try:
+                model = get_remarkable_model(self.remarkable_host)
+            except Exception:
+                print(
+                    f"Can cannot connect to ReMarkable on {self.remarkable_host}. Retrying..."
+                )
+                sleep(0.5)
         device = SCREEN_DEVICE_PER_MODEL[model]
         partial_handler = functools.partial(
             self.handler, device=device
@@ -84,13 +93,10 @@ class Websocket(Thread):
 
 class HttpHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
-        print(f"{'='*5} {self.path} {'='*5}")
         type = "text/html"
         # Switch on path
         if self.path == "/":
             self.path = "/index.html"
-        elif self.path == "/websocket":
-            return None
         elif self.path.startswith("/static/js/"):
             type = "text/javascript"
         elif self.path.startswith("/static/img/"):
