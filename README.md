@@ -41,7 +41,7 @@ Setup:
 
 To run:
 
-1. `./run.sh` (assuming a virtual environnement, otherwise `python3 main.py`)
+1. `./run.sh`
 2. Visit <http://localhost:8001/>
 
 
