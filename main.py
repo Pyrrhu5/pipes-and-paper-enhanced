@@ -4,7 +4,7 @@ from src.cli import cli
 from src.connection import (
     PEN_SCREEN_DEVICE_PER_MODEL,TOUCH_SCREEN_DEVIDE_PER_MODEL, get_remarkable_model, get_screen_listener
 )
-from src.screen_api import get_screen_input
+from src.screen_api import get_screen_input, DeviceTypes, TouchEventCodes, ScreenInputEvent, EventTypes
 from src.server import Websocket, run_http_server
 
 
@@ -18,7 +18,7 @@ def run_pen_debug(ssh_hostname):
     print(f"Listening on {pen_device} through {ssh_hostname}")
 
     while not pen_listener.returncode:
-        pen_screen_input = loop.run_until_complete(get_screen_input(pen_listener))
+        pen_screen_input = loop.run_until_complete(get_screen_input(pen_listener, DeviceTypes.PEN))
         if pen_screen_input:
             print(f"Stylus: {pen_screen_input=}")
 
@@ -33,8 +33,8 @@ def run_touch_debug(ssh_hostname):
     print(f"Listening on {touch_device} through {ssh_hostname}")
 
     while not touch_listener.returncode:
-        touch_screen_input = loop.run_until_complete(get_screen_input(touch_listener))
-        if touch_screen_input:
+        touch_screen_input: ScreenInputEvent = loop.run_until_complete(get_screen_input(touch_listener, DeviceTypes.TOUCH))
+        if touch_screen_input and touch_screen_input.type != EventTypes.SYNC: #  and touch_screen_input.code == TouchEventCodes.ORIENTATION:
             print(f"Touch: {touch_screen_input=}")
 
 

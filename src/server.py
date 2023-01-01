@@ -11,7 +11,7 @@ import websockets
 
 from src.connection import (PEN_SCREEN_DEVICE_PER_MODEL, get_remarkable_model,
                             get_screen_listener)
-from src.screen_api import EventCodes, EventTypes, get_screen_input
+from src.screen_api import PenEventCodes, EventTypes, get_screen_input
 
 
 def websocket_payload(payload_type, message: list[Union[Enum, tuple]]):
@@ -75,15 +75,15 @@ class Websocket(Thread):
                     continue
                 # It's sending coordinates
                 elif screen_input.type == EventTypes.ABSOLUTE:
-                    if screen_input.code == EventCodes.X:
+                    if screen_input.code == PenEventCodes.X:
                         x = screen_input.value
-                    elif screen_input.code == EventCodes.Y:
+                    elif screen_input.code == PenEventCodes.Y:
                         y = screen_input.value
-                    elif screen_input.code == EventCodes.PRESSURE:
+                    elif screen_input.code == PenEventCodes.PRESSURE:
                         pressure = screen_input.value
                     await websocket.send(websocket_payload("coordinates", {"x": x, "y": y, "pressure": pressure}))
                 # It's sending tool used
-                elif screen_input.type == EventTypes.KEY and screen_input.code in (EventCodes.ERASER, EventCodes.TIP):
+                elif screen_input.type == EventTypes.KEY and screen_input.code in (PenEventCodes.ERASER, PenEventCodes.TIP):
                     await websocket.send(websocket_payload("tool", [screen_input.code]))
             print("Disconnected from ReMarkable.")
         finally:
@@ -101,7 +101,7 @@ class HttpHandler(SimpleHTTPRequestHandler):
         elif self.path.startswith("/static/img/"):
             type = "image/svg+xml"
         else:
-            print("UNRECONGIZED REQUEST: ", self.path)
+            print("UNRECOGNIZED REQUEST: ", self.path)
             self.path = "/404"
 
         if self.path != "/404":
