@@ -41,7 +41,7 @@ Setup:
 
 To run:
 
-1. `./run.sh` or use the python interface directly `python3 main.py` to have access to more options
+1. `./run.sh` with the following _optional_ options 
 
 ```
 usage: main.py [-h] [-p PORT] [-s SSH_HOSTNAME] [--screen-debug]
@@ -56,7 +56,7 @@ options:
   --screen-debug        Instead of running the web server, run in screen input debug mode.
 ```
 
-2. Visit <http://localhost:8001/>
+2. Visit http://localhost:8001/
 
 
 ## Original motivation of Joe Wass

@@ -4,4 +4,4 @@ ROOT_PATH="`dirname \"$0\"`"
 if [[ -d "$ROOT_PATH/.venv/" ]]; then
   source $ROOT_PATH/.venv/bin/activate
 fi
-python $ROOT_PATH/main.py
+python3 $ROOT_PATH/main.py "$@"  # Pass all the args
