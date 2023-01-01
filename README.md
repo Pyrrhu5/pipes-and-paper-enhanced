@@ -20,15 +20,17 @@ Tested on Linux, Mac probably works fine, with the ReMarkable 2.
 
 **Planned features**
 
-- [ ] Config to change ports and ReMarkable hostname, etc.
+- [x] ~~Config to change ports and ReMarkable hostname, etc.~~ CLI options for config
+- [ ] Capture next page on tablet to clear the screen
+- [ ] Pages navigations on swipes (browser should remember the drawings on the previous/next pages)
+- [ ] Copy-paste, move, selection, etc. from the tablet
 - [ ] Change canvas orientation according to the tablet portrait/landscape modes
 - [ ] Capture zoom in/out to have kind-of infinite canvas
-- [ ] Capture next page on tablet to clear the screen
 - [ ] Live OCR to transcribe latin handwriting to font
 
-## How to use
+## Installation
 
-You'll need to do a little bit on the command-line. Assuming you have Python 3 installed.
+Assuming you have Python 3 installed.
 
 Setup:
 
@@ -39,7 +41,7 @@ Setup:
 - Optional: activate the virtual environnement `source .venv/bin/activate`
 - Install the project dependencies `pip3 install -r requirements.txt`
 
-To run:
+## Usage
 
 1. `./run.sh` with the following _optional_ options 
 
