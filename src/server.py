@@ -1,7 +1,6 @@
 import asyncio
 from time import sleep
 from typing import Union
-from dataclasses import dataclass
 from enum import Enum
 import functools
 import json
@@ -10,7 +9,7 @@ from threading import Thread
 
 import websockets
 
-from src.connection import (SCREEN_DEVICE_PER_MODEL, get_remarkable_model,
+from src.connection import (PEN_SCREEN_DEVICE_PER_MODEL, get_remarkable_model,
                             get_screen_listener)
 from src.screen_api import EventCodes, EventTypes, get_screen_input
 
@@ -47,7 +46,7 @@ class Websocket(Thread):
                     f"Can cannot connect to ReMarkable on {self.ssh_hostname}. Retrying..."
                 )
                 sleep(0.5)
-        device = SCREEN_DEVICE_PER_MODEL[model]
+        device = PEN_SCREEN_DEVICE_PER_MODEL[model]
         partial_handler = functools.partial(
             self.handler, device=device, ssh_hostname=self.ssh_hostname
         )

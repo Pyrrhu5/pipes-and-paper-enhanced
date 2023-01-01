@@ -20,10 +20,16 @@ def cli() -> ArgumentParser:
         help="The name of the ReMarkable SSH host."
     )
     parser.add_argument(
-        "--screen-debug",
+        "--pen-debug",
         action="store_true",
-        dest="screen_debug",
-        help="Instead of running the web server, run in screen input debug mode."
+        dest="pen_debug",
+        help="Instead of running the web server, run in stylus input debug mode."
+    )
+    parser.add_argument(
+        "--touch-debug",
+        action="store_true",
+        dest="touch_debug",
+        help="Instead of running the web server, run in touch input debug mode."
     )
 
     return parser
