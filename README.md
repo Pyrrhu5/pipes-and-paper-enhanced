@@ -20,9 +20,9 @@ Tested on Linux, Mac probably works fine, with the ReMarkable 2.
 
 **Planned features**
 
-- [x] ~~Config to change ports and ReMarkable hostname, etc.~~ CLI options for config
-- [ ] Capture next page on tablet to clear the screen
-- [ ] Pages navigations on swipes (browser should remember the drawings on the previous/next pages)
+- [ ] Capture next page on tablet to clear the screen (prerequirements WIP)
+- [ ] Pages navigations on swipes left-right (browser should remember the drawings on the previous/next pages) (prerequirements WIP)
+- [ ] In-Page navigation on swipes up-down (prerequirements WIP)
 - [ ] Copy-paste, move, selection, etc. from the tablet
 - [ ] Change canvas orientation according to the tablet portrait/landscape modes
 - [ ] Capture zoom in/out to have kind-of infinite canvas
@@ -76,3 +76,10 @@ And I wanted a little project. Part of the reason I bought this tablet was the a
 The Remarkable tablet has access to the binary event stream for its input sensors in `/dev/input/event0`. It also allows SSH access. This streams the sensor data over SSH, parses the binary stream and sends it over a websocket to a browser.
 
 The browser has some rudimentary smoothing, plus hover indicator.
+
+## Contributors
+
+- [Joe Wass](https://gitlab.com/afandian): original repo
+- [Alex Riesen](https://gitlab.com/raalkml)
+- [Trevor Spiteri](https://gitlab.com/tspiteri)
+- [RedTartan04](https://github.com/RedTartan04)
