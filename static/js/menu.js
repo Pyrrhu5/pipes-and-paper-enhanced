@@ -54,8 +54,7 @@ function on_key_press(e) {
       setPenIconStyle();
       break;
     default:
-      if (!pause) {
-        if (action in pencolors && last_tool == tools.TIP) {
+        if (!pause && action in pencolors && last_tool == tools.TIP) {
           // select pen colour
           penColor = pencolors[action];
           setPenIconStyle();
