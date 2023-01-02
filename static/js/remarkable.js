@@ -10,7 +10,7 @@ var RATIO = MAX_X / MAX_Y;
 var MAX_PRESSURE = 4095;
 var MAX_DISPLAY_PRESSURE = 10;
 var RINGBUFFER_SIZE = 10;
-var last_tool = tools.ERASER;
+var last_tool = tools.TIP;
 var CANVAS_HEIGHT = MAX_Y / 10;
 var CANVAS_WIDTH = MAX_X / 10;
 
@@ -51,15 +51,29 @@ let lastY = null;
 let penColor = "rgb(0, 0, 0)";
 
 
+// Don't write with tip when paused
+let pause = false;
+
+// pen icon and handler for tool changes
 pen_menu_logo = document.getElementById("pen")
 pen_menu_logo.addEventListener('load', function () {
-    if (last_tool == tools.TIP && penColor != pencolors.BLACK) {
-        pen_menu_logo.contentDocument.getElementById("icon").setAttribute("fill", penColor);
-    } else {
-        pen_menu_logo.contentDocument.getElementById("icon").setAttribute("fill", "#efeff3");
-    }
+    setPenIconStyle();
 });
 
+function setPenIconStyle() {
+    if (pause) {
+        // grey pen icon in pause mode
+        pen_menu_logo.contentDocument.getElementById("icon").setAttribute("fill", pencolors.GRAY);
+    } else {
+        if (last_tool == tools.TIP && penColor != pencolors.BLACK) {
+            // coloured icon if coloured pen
+            pen_menu_logo.contentDocument.getElementById("icon").setAttribute("fill", penColor);
+        } else {
+            // light grey icon if eraser or black pen
+            pen_menu_logo.contentDocument.getElementById("icon").setAttribute("fill", pencolors.LIGHTGRAY);
+        }
+    }
+}
 
 function draw() {
     // Loop through ringbuffer elements...
@@ -92,7 +106,7 @@ function draw() {
         lastY = null;
     } else {
         // Only start drawing if we already started a line.
-        if (penState) {
+        if (penState && !pause) {
             if (last_tool == tools.TIP) {
                 if (!penColor.length) {
                     ctx.save();
@@ -125,7 +139,7 @@ function draw() {
 
 function overlay(x, y) {
     // Clear when hovering, but keep drawing for the duration of a stroke to highlight it.
-    if (!penState) {
+    if (!penState || pause) {
         ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
     }
     ctx_overlay.fillStyle = "rgb(200, 200, 255)";
