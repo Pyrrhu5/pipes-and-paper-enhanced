@@ -50,9 +50,17 @@ let lastY = null;
 
 let penColor = "rgb(0, 0, 0)";
 
-
 // Don't write with tip when paused
 let pause = false;
+
+// The 'glow' for pen, eraser and pause/pointer
+const overlayColors = {
+    "PEN": "rgb(200, 200, 255)",
+    "ERASER": "rgb(255, 150, 150)",
+    "POINTER": "rgb(0, 150, 80)",
+  }
+let overlayPenWidth = 5
+let overlayEraserWidth = 10 // also defines actual eraser width
 
 // pen icon and handler for tool changes
 pen_menu_logo = document.getElementById("pen")
@@ -124,7 +132,8 @@ function draw() {
                     ctx.stroke();
                 }
             } else if (last_tool == tools.ERASER) {
-                ctx.clearRect(avgX - 10, avgY - 10, 20, 20);
+                ctx.clearRect(avgX - overlayEraserWidth, avgY - overlayEraserWidth,
+                              2 * overlayEraserWidth, 2 * overlayEraserWidth);
             }
         }
         penState = true;
@@ -142,9 +151,23 @@ function overlay(x, y) {
     if (!penState || pause) {
         ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
     }
-    ctx_overlay.fillStyle = "rgb(200, 200, 255)";
+    // Use different 'glow' colours for pen, eraser and pause/pointer mode
+    if (pause) {
+        ctx_overlay.fillStyle = overlayColors.POINTER
+    } else {
+        if (last_tool == tools.ERASER) {
+            ctx_overlay.fillStyle = overlayColors.ERASER;
+        } else {
+            ctx_overlay.fillStyle = overlayColors.PEN;
+        }
+    }
     ctx_overlay.beginPath();
-    ctx_overlay.arc(x, y, 10, 0, 2 * Math.PI);
+    // Use different widths for pen and eraser
+    let overlayWidth = overlayPenWidth
+    if (last_tool == tools.ERASER) {
+        overlayWidth = overlayEraserWidth;
+    }
+    ctx_overlay.arc(x, y, overlayWidth, 0, 2 * Math.PI);
     ctx_overlay.fill();
 }
 
