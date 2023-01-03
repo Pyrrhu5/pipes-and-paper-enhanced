@@ -31,7 +31,11 @@ if [ $? -eq 0 ]
 then
   echo "** reMarkable was found"
   echo "** connecting whiteboard to $rMhostname"
-  
+
+  # open browser window after server had time to start up
+  (sleep 2 && open http://localhost:8001) &
+
+  # start server
   cd $runCommandPath
   $runCommandPath/run.sh --ssh-hostname $rMhostname
 
