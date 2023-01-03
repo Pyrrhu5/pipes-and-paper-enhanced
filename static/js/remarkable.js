@@ -65,7 +65,7 @@ let overlayEraserWidth = 10 // also defines actual eraser width
 // pen icon and handler for tool changes
 pen_menu_logo = document.getElementById("pen")
 pen_menu_logo.addEventListener('load', function () {
-    setPenIconStyle();
+    setPenIconColor();
 });
 
 function draw() {

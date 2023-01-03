@@ -1,7 +1,7 @@
-function setPenIconStyle() {
+function setPenIconColor() {
     if (pause) {
-        // grey pen icon in pause mode
-        pen_menu_logo.contentDocument.getElementById("icon").setAttribute("fill", pencolors.GRAY);
+        // presentation icon
+        pen_menu_logo.contentDocument.getElementById("icon").setAttribute("fill", pencolors.LIGHTGRAY);
     } else {
         if (last_tool == tools.TIP && penColor != pencolors.BLACK) {
             // coloured icon if coloured pen
@@ -11,4 +11,20 @@ function setPenIconStyle() {
             pen_menu_logo.contentDocument.getElementById("icon").setAttribute("fill", pencolors.LIGHTGRAY);
         }
     }
+}
+
+function setPenIconImage() {
+    if (pause) {
+         // presentation icon
+        pen_menu_logo.data = "static/img/person-chalkboard-solid.svg";
+    } else {
+        // pen tool icons
+        switch (last_tool) {
+            case tools.ERASER:
+                pen_menu_logo.data = "static/img/eraser-solid.svg";
+                break;
+            case tools.TIP:
+                pen_menu_logo.data = "static/img/pen-solid.svg";
+                break;
+        }    }
 }

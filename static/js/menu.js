@@ -51,13 +51,14 @@ function on_key_press(e) {
       break;
     case "PAUSE":
       pause = !pause;
-      setPenIconStyle();
+      setPenIconColor();
+      setPenIconImage();
       break;
     default:
       if (!pause && action in pencolors && last_tool == tools.TIP) {
         // select pen colour
         penColor = pencolors[action];
-        setPenIconStyle();
+        setPenIconColor();
       }
   }
 }
