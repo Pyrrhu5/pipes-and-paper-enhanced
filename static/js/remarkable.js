@@ -50,10 +50,10 @@ let lastY = null;
 
 let penColor = "rgb(0, 0, 0)";
 
-// Don't write with tip when paused
-let pause = false;
+// Don't write with tip when in presentation mode
+let presentation = false;
 
-// The 'glow' for pen, eraser and pause/pointer
+// The 'glow' for pen, eraser and presentation/pointer
 const overlayColors = {
     "PEN": "rgb(200, 200, 255)",
     "ERASER": "rgb(255, 150, 150)",
@@ -99,7 +99,7 @@ function draw() {
         lastY = null;
     } else {
         // Only start drawing if we already started a line.
-        if (penState && !pause) {
+        if (penState && !presentation) {
             if (last_tool == tools.TIP) {
                 if (!penColor.length) {
                     ctx.save();
@@ -133,11 +133,11 @@ function draw() {
 
 function overlay(x, y) {
     // Clear when hovering, but keep drawing for the duration of a stroke to highlight it.
-    if (!penState || pause) {
+    if (!penState || presentation) {
         ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
     }
-    // Use different 'glow' colours for pen, eraser and pause/pointer mode
-    if (pause) {
+    // Use different 'glow' colours for pen, eraser and presentation/pointer mode
+    if (presentation) {
         ctx_overlay.fillStyle = overlayColors.POINTER
     } else {
         if (last_tool == tools.ERASER) {

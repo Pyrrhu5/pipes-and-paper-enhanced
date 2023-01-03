@@ -13,7 +13,7 @@ const keyevents = {
   54: "BLUE",
   55: "VERMILLON",
   56: "PURPLE",
-  80: "PAUSE"
+  80: "PRESENTATION"
 };
 
 // Mapping between actions and RGB colors
@@ -49,13 +49,13 @@ function on_key_press(e) {
     case "DEBUG":
       debug = !debug;
       break;
-    case "PAUSE":
-      pause = !pause;
+    case "PRESENTATION":
+      presentation = !presentation;
       setPenIconColor();
       setPenIconImage();
       break;
     default:
-      if (!pause && action in pencolors && last_tool == tools.TIP) {
+      if (!presentation && action in pencolors && last_tool == tools.TIP) {
         // select pen colour
         penColor = pencolors[action];
         setPenIconColor();

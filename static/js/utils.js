@@ -1,5 +1,5 @@
 function setPenIconColor() {
-    if (pause) {
+    if (presentation) {
         // presentation icon
         pen_menu_logo.contentDocument.getElementById("icon").setAttribute("fill", pencolors.LIGHTGRAY);
     } else {
@@ -14,7 +14,7 @@ function setPenIconColor() {
 }
 
 function setPenIconImage() {
-    if (pause) {
+    if (presentation) {
          // presentation icon
         pen_menu_logo.data = "static/img/person-chalkboard-solid.svg";
     } else {

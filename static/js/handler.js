@@ -4,8 +4,8 @@ let websocket = new WebSocket("ws://" + "localhost:6789" + "/websocket");
 function handle_tool_message(message) {
     if (tools[message] == last_tool) { return; }
     last_tool = tools[message];
-    // switch tool icon only if not in pause mode
-    if (!pause) {
+    // switch tool icon only if not in presentation mode
+    if (!presentation) {
         pen_menu_logo = document.getElementById("pen");
         switch (last_tool) {
             case tools.ERASER:
