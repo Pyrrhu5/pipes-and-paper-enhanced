@@ -6,7 +6,12 @@ This project aims to enable screen sharing between the ReMarkable tablet and a b
 
 Copies pen strokes, not the contents of the screen, but that's fine for live-sharing sketches.
 
-Tested on Linux, Mac probably works fine, with the ReMarkable 2.
+Support:
+
+- Tested on Linux
+- Mac works fine
+- ReMarkable 2
+- Might work for the ReMarkable 1 (untested)
 
 ![screenshot](images/screenshot.jpg)
 
@@ -40,6 +45,24 @@ Setup:
 - Optional: set a virtual environnement `python3 -m venv .venv`
 - Optional: activate the virtual environnement `source .venv/bin/activate`
 - Install the project dependencies `pip3 install -r requirements.txt`
+
+### For MacOS users
+
+A convenience script that one can use as any other MacOS application can be found `rMwhiteboard.command`.
+
+It provides the following advantages:
+
+- behave like any MacOS app
+- tries two hostnames until one is reachable (for a setup one in wifi, the other in usb)
+- open automatically the browser with the proper address when the server is ready
+
+
+Some customization might be required and are marked within the script by `#TODO`.
+
+For it to work without modification, please follow this requirements:
+
+- An SSH hostname named `rm2` and an alternate one `rm2usb`
+- The repo has been cloned in `~/Develop/pipes-and-paper-enhanced`
 
 ## Usage
 

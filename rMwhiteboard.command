@@ -7,10 +7,13 @@
 # 
 
 ## (assignments must not have spaces around = sign...)
+#TODO change the SSH hostnames if need be
+# The script will try the rMhostname first, then rMhostname2
 rMhostname="rm2"
 rMhostname2="rm2usb"
 
 ## Do not enclose a path with ~ in "", otherwise the ~ is not expanded 
+#TODO put the path on the machine to the repository here
 runCommandPath=~/Develop/pipes-and-paper-enhanced
 
 # is the rM online?
@@ -37,6 +40,7 @@ then
 
   # start server
   cd $runCommandPath
+  #TODO customize the CLI parameters here
   $runCommandPath/run.sh --ssh-hostname $rMhostname
 
   exit $?
