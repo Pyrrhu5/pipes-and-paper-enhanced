@@ -20,8 +20,9 @@ Support:
 - [x] Write with the stylus (contributions from [Joe Wass](https://gitlab.com/afandian))
 - [x] Erase with the stylus (contributions from [Alex Riesen](https://gitlab.com/raalkml))
 - [x] Change color (with <kbd>1</kbd> to <kbd>8</kbd>) (contributions from [Trevor Spiteri](https://gitlab.com/tspiteri))
-- [x] Responsive interface
 - [x] Clear the screen with <kbd>space</kbd> (contributions from [Joe Wass](https://gitlab.com/afandian))
+- [x] Presentation mode: a mode where writing and erasing is disable, but a pointer allows to highlight elements to the viewers. Use <kbd>P</kbd> to enter/leave this mode  (a feature made by [RedTartan04](https://github.com/RedTartan04))
+- [x] Responsive interface
 
 **Planned features**
 
