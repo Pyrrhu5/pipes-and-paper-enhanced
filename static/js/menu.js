@@ -13,6 +13,7 @@ const keyevents = {
   54: "BLUE",
   55: "VERMILLON",
   56: "PURPLE",
+  80: "PRESENTATION"
 };
 
 // Mapping between actions and RGB colors
@@ -25,6 +26,8 @@ const pencolors = {
   "BLUE": "rgb(0, 114, 178)",
   "VERMILLON": "rgb(213, 94, 0)",
   "PURPLE": "rgb(204, 121, 167)",
+  "GRAY": "rgb(180, 180, 180)",
+  "LIGHTGRAY": "rgb(240, 240, 240)",
 }
 
 function on_key_press(e) {
@@ -46,10 +49,16 @@ function on_key_press(e) {
     case "DEBUG":
       debug = !debug;
       break;
+    case "PRESENTATION":
+      presentation = !presentation;
+      setPenIconColor();
+      setPenIconImage();
+      break;
     default:
-      if (action in pencolors && last_tool == tools.TIP) {
+      if (!presentation && action in pencolors && last_tool == tools.TIP) {
+        // select pen colour
         penColor = pencolors[action];
-        document.getElementById("pen").contentDocument.getElementById("icon").setAttribute("fill", pencolors[action]);
+        setPenIconColor();
       }
   }
 }

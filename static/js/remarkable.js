@@ -10,7 +10,7 @@ var RATIO = MAX_X / MAX_Y;
 var MAX_PRESSURE = 4095;
 var MAX_DISPLAY_PRESSURE = 10;
 var RINGBUFFER_SIZE = 10;
-var last_tool = tools.ERASER;
+var last_tool = tools.TIP;
 var CANVAS_HEIGHT = MAX_Y / 10;
 var CANVAS_WIDTH = MAX_X / 10;
 
@@ -50,21 +50,23 @@ let lastY = null;
 
 let penColor = "rgb(0, 0, 0)";
 
-// The 'glow' of pen and eraser
-let overlayPenColor = "rgb(200, 200, 255)"
-let overlayEraserColor = "rgb(255, 200, 200)"
+// Don't write with tip when in presentation mode
+let presentation = false;
+
+// The 'glow' for pen, eraser and presentation/pointer
+const overlayColors = {
+    "PEN": "rgb(200, 200, 255)",
+    "ERASER": "rgb(255, 150, 150)",
+    "POINTER": "rgb(0, 150, 80)",
+  }
 let overlayPenWidth = 5
 let overlayEraserWidth = 10 // also defines actual eraser width
 
+// pen icon and handler for tool changes
 pen_menu_logo = document.getElementById("pen")
 pen_menu_logo.addEventListener('load', function () {
-    if (last_tool == tools.TIP && penColor != pencolors.BLACK) {
-        pen_menu_logo.contentDocument.getElementById("icon").setAttribute("fill", penColor);
-    } else {
-        pen_menu_logo.contentDocument.getElementById("icon").setAttribute("fill", "#efeff3");
-    }
+    setPenIconColor();
 });
-
 
 function draw() {
     // Loop through ringbuffer elements...
@@ -97,7 +99,7 @@ function draw() {
         lastY = null;
     } else {
         // Only start drawing if we already started a line.
-        if (penState) {
+        if (penState && !presentation) {
             if (last_tool == tools.TIP) {
                 if (!penColor.length) {
                     ctx.save();
@@ -116,7 +118,7 @@ function draw() {
                 }
             } else if (last_tool == tools.ERASER) {
                 ctx.clearRect(avgX - overlayEraserWidth, avgY - overlayEraserWidth,
-                    2 * overlayEraserWidth, 2 * overlayEraserWidth);
+                              2 * overlayEraserWidth, 2 * overlayEraserWidth);
             }
         }
         penState = true;
@@ -131,14 +133,18 @@ function draw() {
 
 function overlay(x, y) {
     // Clear when hovering, but keep drawing for the duration of a stroke to highlight it.
-    if (!penState) {
+    if (!penState || presentation) {
         ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
     }
-    // Use different 'glow' colours for pen and eraser
-    if (last_tool == tools.ERASER) {
-        ctx_overlay.fillStyle = overlayEraserColor;
+    // Use different 'glow' colours for pen, eraser and presentation/pointer mode
+    if (presentation) {
+        ctx_overlay.fillStyle = overlayColors.POINTER
     } else {
-        ctx_overlay.fillStyle = overlayPenColor;
+        if (last_tool == tools.ERASER) {
+            ctx_overlay.fillStyle = overlayColors.ERASER;
+        } else {
+            ctx_overlay.fillStyle = overlayColors.PEN;
+        }
     }
     ctx_overlay.beginPath();
     // Use different widths for pen and eraser
