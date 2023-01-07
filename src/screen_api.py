@@ -53,7 +53,6 @@ class PenEventCodes(IntEnum):
         return cls.UNKNOWN
 
 
-
 class TouchEventCodes(IntEnum):
     """For the touch gestures, which data point the value is a reference of, by evdev driver codes.
 
@@ -61,6 +60,7 @@ class TouchEventCodes(IntEnum):
     Returns cls.UNKNOWN for missing values.
     The value is the direct int representation of the buffer.
     """
+    DISCARD = 0
     SLOT = 47  # if present, more than one finger on the screen, each value represents a finger
     X = 53
     Y = 54
@@ -79,7 +79,6 @@ class TouchEventCodes(IntEnum):
         """Provides a fallback value for unrepresented values to cls.UNKNOWN"""
         print(f"{cls} can not represent {value}. Defaulting to {cls.UNKNOWN}")
         return cls.UNKNOWN
-
 
 
 @dataclass

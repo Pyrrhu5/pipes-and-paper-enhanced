@@ -5,6 +5,7 @@ from src.connection import (
     PEN_SCREEN_DEVICE_PER_MODEL,TOUCH_SCREEN_DEVIDE_PER_MODEL, get_remarkable_model, get_screen_listener
 )
 from src.screen_api import get_screen_input, DeviceTypes, TouchEventCodes, ScreenInputEvent, EventTypes
+from src.gestures import get_screen_gestures
 from src.server import Websocket, run_http_server
 
 
@@ -33,9 +34,19 @@ def run_touch_debug(ssh_hostname):
     print(f"Listening on {touch_device} through {ssh_hostname}")
 
     while not touch_listener.returncode:
-        touch_screen_input: ScreenInputEvent = loop.run_until_complete(get_screen_input(touch_listener, DeviceTypes.TOUCH))
-        if touch_screen_input and touch_screen_input.type != EventTypes.SYNC: #  and touch_screen_input.code == TouchEventCodes.ORIENTATION:
-            print(f"Touch: {touch_screen_input=}")
+        gesture = loop.run_until_complete(get_screen_gestures(touch_listener))
+        print(f"{gesture=}")
+        if gesture.slots[list(gesture.slots.keys())[0]].x:
+            print(f"X {gesture.slots[list(gesture.slots.keys())[0]].x}")
+
+    # while not touch_listener.returncode:
+    #     touch_screen_input: ScreenInputEvent = loop.run_until_complete(get_screen_input(touch_listener, DeviceTypes.TOUCH))
+    #     if not touch_screen_input:
+    #         continue
+    #     elif touch_screen_input.code == TouchEventCodes.TRACKING_ID:
+    #         print(f"End gesture: {touch_screen_input=}")
+    #     else:
+    #         print(f"Touch: {touch_screen_input=}")
 
 
 def run_server(ssh_hostname, http_port):

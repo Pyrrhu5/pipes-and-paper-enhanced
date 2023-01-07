@@ -18,7 +18,7 @@ def websocket_payload(payload_type, message: list[Union[Enum, tuple]]):
     payload = {"type": payload_type}
     if isinstance(message, dict):
         payload["message"] = message
-    elif not len(message):
+    elif len(message) == 0:
         ...
     elif isinstance(message[0], Enum):
         payload["message"] = {
