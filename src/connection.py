@@ -20,10 +20,13 @@ SCREEN_DEVICE_PER_MODEL: dict[RemarkableModels, str] = {
 }
 
 
-def get_remarkable_model(ssh_hostname):
+def get_remarkable_model(ssh_hostname: str, ssh_password: str):
     try:
         model = subprocess.run(
             [
+                "sshpass",
+                "-p",
+                ssh_password,
                 "ssh",
                 "-o",
                 "ConnectTimeout=2",
@@ -40,8 +43,8 @@ def get_remarkable_model(ssh_hostname):
             f"Can't connect to reMarkable tablet on hostname : {ssh_hostname}")
 
 
-async def get_screen_listener(device: str, ssh_hostname: str):
-    command = f"ssh -o ConnectTimeout=2 {ssh_hostname} cat {device}"
+async def get_screen_listener(device: str, ssh_hostname: str, ssh_password: str):
+    command = f"sshpass -p '{ssh_password}' ssh -o ConnectTimeout=2 {ssh_hostname} cat {device}"
 
     return await asyncio.create_subprocess_shell(
         command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE

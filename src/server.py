@@ -30,10 +30,11 @@ def websocket_payload(payload_type, message: list[Union[Enum, tuple]]):
 
 
 class Websocket(Thread):
-    def __init__(self, ssh_hostname: str, port: int = 6789, address: str = "localhost") -> None:
+    def __init__(self, ssh_hostname: str, ssh_password: str, port: int = 6789, address: str = "localhost") -> None:
         self.port = port
         self.address = address
         self.ssh_hostname = ssh_hostname
+        self.ssh_password = ssh_password
         super().__init__(daemon=True)
 
     def run(self):
@@ -41,7 +42,7 @@ class Websocket(Thread):
         model = None
         while not model:
             try:
-                model = get_remarkable_model(self.ssh_hostname)
+                model = get_remarkable_model(self.ssh_hostname, self.ssh_password)
             except Exception:
                 print(
                     f"Can cannot connect to ReMarkable on {self.ssh_hostname}. Retrying..."
@@ -49,7 +50,7 @@ class Websocket(Thread):
                 sleep(0.5)
         device = SCREEN_DEVICE_PER_MODEL[model]
         partial_handler = functools.partial(
-            self.handler, device=device, ssh_hostname=self.ssh_hostname
+            self.handler, device=device, ssh_hostname=self.ssh_hostname, ssh_password=self.ssh_password
         )
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -60,12 +61,12 @@ class Websocket(Thread):
             f"Websocket ready and running on http://{self.address}:{self.port}")
         asyncio.get_event_loop().run_forever()
 
-    async def handler(self, websocket, path, device, ssh_hostname):
+    async def handler(self, websocket, path, device, ssh_hostname, ssh_password):
         x = 0
         y = 0
         pressure = 0
 
-        listener = await get_screen_listener(device, ssh_hostname)
+        listener = await get_screen_listener(device, ssh_hostname, ssh_password)
         try:
             # Keep looping as long as the process is alive.
             # Terminated websocket connection is handled with a throw.

@@ -20,6 +20,11 @@ def cli() -> ArgumentParser:
         help="The name of the ReMarkable SSH host."
     )
     parser.add_argument(
+        "-P", "--ssh-password",
+        dest="ssh_password",
+        help="The ssh password of the ReMarkable host."
+    )
+    parser.add_argument(
         "--screen-debug",
         action="store_true",
         dest="screen_debug",
