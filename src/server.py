@@ -1,6 +1,6 @@
 import asyncio
 from time import sleep
-from typing import Union
+from typing import Union, List
 from dataclasses import dataclass
 from enum import Enum
 import functools
@@ -15,7 +15,7 @@ from src.connection import (SCREEN_DEVICE_PER_MODEL, get_remarkable_model,
 from src.screen_api import EventCodes, EventTypes, get_screen_input
 
 
-def websocket_payload(payload_type, message: list[Union[Enum, tuple]]):
+def websocket_payload(payload_type, message: List[Union[Enum, tuple]]):
     payload = {"type": payload_type}
     if isinstance(message, dict):
         payload["message"] = message

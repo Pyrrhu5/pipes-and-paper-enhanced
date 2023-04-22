@@ -36,7 +36,7 @@ Support:
 
 ## Installation
 
-Assuming you have Python 3 installed.
+Assuming you have Python 3 (at least `3.8.5`, previous versions are not supported) installed.
 
 Setup:
 
