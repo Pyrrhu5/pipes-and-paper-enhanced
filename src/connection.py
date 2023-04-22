@@ -3,6 +3,7 @@
 import asyncio
 import subprocess
 from enum import Enum
+from typing import Dict
 
 
 class RemarkableModels(str, Enum):
@@ -14,7 +15,7 @@ class RemarkableModels(str, Enum):
         raise NotImplementedError(f"Unsupported reMarkable Device : {value}")
 
 
-SCREEN_DEVICE_PER_MODEL: dict[RemarkableModels, str] = {
+SCREEN_DEVICE_PER_MODEL: Dict[RemarkableModels, str] = {
     RemarkableModels.V1: "/dev/input/event0",
     RemarkableModels.V2: "/dev/input/event1"
 }
