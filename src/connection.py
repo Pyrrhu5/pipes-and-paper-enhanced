@@ -9,6 +9,7 @@ from typing import Dict
 class RemarkableModels(str, Enum):
     V1 = "reMarkable 1.0"
     V2 = "reMarkable 2.0"
+    PP = "reMarkable Ferrari"
 
     @classmethod
     def _missing_(cls, value: object) -> None:
@@ -17,7 +18,8 @@ class RemarkableModels(str, Enum):
 
 SCREEN_DEVICE_PER_MODEL: Dict[RemarkableModels, str] = {
     RemarkableModels.V1: "/dev/input/event0",
-    RemarkableModels.V2: "/dev/input/event1"
+    RemarkableModels.V2: "/dev/input/event1",
+    RemarkableModels.PP: "/dev/input/event2",
 }
 
 
@@ -35,7 +37,9 @@ def get_remarkable_model(ssh_hostname):
             check=True,
             capture_output=True,
         )
-        return RemarkableModels(model.stdout[:14].decode("utf-8"))
+
+        model_name = model.stdout.decode("utf-8").rstrip("\x00")
+        return RemarkableModels(model_name)
     except subprocess.CalledProcessError:
         raise ValueError(
             f"Can't connect to reMarkable tablet on hostname : {ssh_hostname}")

@@ -7,6 +7,8 @@ from json import dumps
 from struct import unpack
 from typing import Optional, Union
 
+from src.connection import RemarkableModels
+
 
 class EventTypes(int, Enum):
     """Type of events."""
@@ -67,7 +69,7 @@ class ScreenInputEvent:
         return dumps(self.__dict__)
 
 
-def decode_screen_event(buffer: bytes) -> ScreenInputEvent:
+def decode_screen_event(model: RemarkableModels, buffer: bytes) -> ScreenInputEvent:
     """Decode the bytes received from the screen events.
 
     Some part of the buffer are not decoded:
@@ -77,18 +79,45 @@ def decode_screen_event(buffer: bytes) -> ScreenInputEvent:
         https://github.com/ichaozi/RemarkableFramebuffer
         https://github.com/canselcik/libremarkable
     """
+
+    if model in [RemarkableModels.V1, RemarkableModels.V2]:
+        (timestamp,
+         _,
+         type,
+         code,
+         value,
+        ) = unpack("<fiHHi", buffer)
+    elif model == RemarkableModels.PP:
+        (seconds,
+         subseconds,
+         type,
+         code,
+         value,
+        ) = unpack("<QQHHi", buffer)
+
+        timestamp = seconds + subseconds / 1000000
+    else:
+        raise NotImplementedError()
+
     return ScreenInputEvent(
-        timestamp=unpack("f", buffer[0:4])[0],
-        type=EventTypes(unpack("h", buffer[8:10])[0]),
-        code=EventCodes(unpack("h", buffer[10:12])[0]),
-        value=unpack("i", buffer[12:16])[0],
+        timestamp=timestamp,
+        type=type,
+        code=code,
+        value=value,
     )
 
 
-async def get_screen_input(subprocess_shell: Process) -> Optional[ScreenInputEvent]:
-    buffer: bytes = await subprocess_shell.stdout.read(16)
+async def get_screen_input(model, subprocess_shell: Process) -> Optional[ScreenInputEvent]:
+    if model in [RemarkableModels.V1, RemarkableModels.V2]:
+        packet_size = 16
+    elif model == RemarkableModels.PP:
+        packet_size = 24
+    else:
+        raise NotImplementedError()
 
-    if not len(buffer) == 16:
-        raise ValueError(f"Buffer is not 16 bits: {len(buffer)=} {buffer=}")
+    buffer: bytes = await subprocess_shell.stdout.read(packet_size)
 
-    return decode_screen_event(buffer)
+    if not len(buffer) == 24:
+        raise ValueError(f"Buffer is not {packet_size} bytes: {len(buffer)=} {buffer=}")
+
+    return decode_screen_event(model, buffer)
