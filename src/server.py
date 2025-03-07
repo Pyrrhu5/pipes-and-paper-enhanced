@@ -8,7 +8,7 @@ import json
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from threading import Thread
 
-import websockets
+import websockets.legacy.server
 
 from src.connection import (SCREEN_DEVICE_PER_MODEL, get_remarkable_model,
                             get_screen_listener)
@@ -54,7 +54,7 @@ class Websocket(Thread):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(
-            websockets.serve(partial_handler, self.address, self.port)
+            websockets.legacy.server.serve(partial_handler, self.address, self.port)
         )
         print(
             f"Websocket ready and running on http://{self.address}:{self.port}")
