@@ -117,7 +117,7 @@ async def get_screen_input(model, subprocess_shell: Process) -> Optional[ScreenI
 
     buffer: bytes = await subprocess_shell.stdout.read(packet_size)
 
-    if not len(buffer) == 24:
+    if len(buffer) != packet_size:
         raise ValueError(f"Buffer is not {packet_size} bytes: {len(buffer)=} {buffer=}")
 
     return decode_screen_event(model, buffer)
