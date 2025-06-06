@@ -8,7 +8,7 @@ import json
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from threading import Thread
 
-import websockets
+import websockets.legacy.server
 
 from src.connection import (SCREEN_DEVICE_PER_MODEL, get_remarkable_model,
                             get_screen_listener)
@@ -49,18 +49,18 @@ class Websocket(Thread):
                 sleep(0.5)
         device = SCREEN_DEVICE_PER_MODEL[model]
         partial_handler = functools.partial(
-            self.handler, device=device, ssh_hostname=self.ssh_hostname
+            self.handler, model=model, device=device, ssh_hostname=self.ssh_hostname
         )
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(
-            websockets.serve(partial_handler, self.address, self.port)
+            websockets.legacy.server.serve(partial_handler, self.address, self.port)
         )
         print(
             f"Websocket ready and running on http://{self.address}:{self.port}")
         asyncio.get_event_loop().run_forever()
 
-    async def handler(self, websocket, path, device, ssh_hostname):
+    async def handler(self, websocket, path, model, device, ssh_hostname):
         x = 0
         y = 0
         pressure = 0
@@ -70,7 +70,7 @@ class Websocket(Thread):
             # Keep looping as long as the process is alive.
             # Terminated websocket connection is handled with a throw.
             while not listener.returncode:
-                screen_input = await get_screen_input(listener)
+                screen_input = await get_screen_input(model, listener)
 
                 if not screen_input:
                     continue
